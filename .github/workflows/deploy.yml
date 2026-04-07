@@ -5,7 +5,7 @@ on:
     branches:
       - main
 
-# THIS IS THE KEY FIX: Tells the robot to run all commands inside the subfolder
+ 
 defaults:
   run:
     working-directory: ./my-react-app
@@ -23,7 +23,7 @@ jobs:
           node-version: '20'
 
       - name: Install Dependencies
-        run: npm install  # Changed from 'npm ci' to be more flexible
+        run: npm install   
 
       - name: Build React App
         run: npm run build
