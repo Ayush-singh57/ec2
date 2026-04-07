@@ -1,0 +1,41 @@
+name: Deploy React App to EC2
+
+# Tell GitHub to run this script whenever code is pushed to 'main'
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest # GitHub borrows a temporary Linux server
+
+    steps:
+      # Step 1: Grab the latest code
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Step 2: Install Node.js v20 (Since Vite requires it!)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Step 3: Download dependencies
+      - name: Install Dependencies
+        run: npm ci
+
+      # Step 4: Compile the React code
+      - name: Build React App
+        run: npm run build
+
+      # Step 5: Securely copy the files to the AWS Server
+      - name: Deploy to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "dist/*"                  # Grab the compiled files
+          target: "/var/www/html/"          # Drop them in the Nginx folder
+          strip_components: 1             # Removes the outer 'dist' folder wrap
