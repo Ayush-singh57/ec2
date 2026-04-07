@@ -35,7 +35,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          # The robot looks from the root, so we point to the dist folder
+          # The robot looks from the root, so we point to the dist folde
           source: "my-react-app/dist/*"
           target: "/var/www/html/"
           # strip_components: 2 removes "my-react-app" and "dist" 
