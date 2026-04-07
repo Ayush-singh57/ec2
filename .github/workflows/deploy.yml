@@ -18,24 +18,26 @@ jobs:
         with:
           node-version: '20'
 
-      # We tell npm exactly WHICH folder to look in
+      # Step 1: Install dependencies inside the subfolder
       - name: Install Dependencies
         run: npm install
         working-directory: ./my-react-app
 
-      # We tell Vite exactly WHICH folder to build
+      # Step 2: Build the project where index.html lives
       - name: Build React App
         run: npm run build
         working-directory: ./my-react-app
 
+      # Step 3: Securely copy files to AWS
       - name: Deploy to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          # Look for the 'dist' folder INSIDE 'my-react-app'
+          # The robot looks from the root, so we point to the dist folder
           source: "my-react-app/dist/*"
           target: "/var/www/html/"
-          # 2 components = strip 'my-react-app' and 'dist'
+          # strip_components: 2 removes "my-react-app" and "dist" 
+          # so files land directly in /var/www/html/
           strip_components: 2
