@@ -5,14 +5,10 @@ on:
     branches:
       - main
 
- 
-defaults:
-  run:
-    working-directory: ./my-react-app
-
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -22,11 +18,15 @@ jobs:
         with:
           node-version: '20'
 
+      # We tell npm exactly WHICH folder to look in
       - name: Install Dependencies
-        run: npm install   
+        run: npm install
+        working-directory: ./my-react-app
 
+      # We tell Vite exactly WHICH folder to build
       - name: Build React App
         run: npm run build
+        working-directory: ./my-react-app
 
       - name: Deploy to EC2
         uses: appleboy/scp-action@v0.1.7
@@ -34,7 +34,8 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          # Update this source to find the 'dist' folder inside the subfolder 'my-react-app'
+          # Look for the 'dist' folder INSIDE 'my-react-app'
           source: "my-react-app/dist/*"
           target: "/var/www/html/"
-          strip_components: 2 
+          # 2 components = strip 'my-react-app' and 'dist'
+          strip_components: 2
